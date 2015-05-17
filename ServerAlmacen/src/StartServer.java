@@ -20,7 +20,7 @@ public class StartServer {
     	try {
 			
     		//read products from file
-    		BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sala_a\\workspace-kepler2\\ServerAlmacen\\src\\products.txt"));
+    		BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sala_a\\workspace-kepler2\\DistriTienda\\ServerAlmacen\\src\\products.txt"));
     		products = new HashMap<String, Integer>();
 			String line;
 			while( (line = br.readLine()) != null ){
