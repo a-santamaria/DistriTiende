@@ -1,0 +1,3 @@
+maleta 5
+nexus5 2
+macbook 1
