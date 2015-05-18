@@ -15,9 +15,10 @@ public class Client {
 	private static HashMap<String, Integer> productMap;
 	
 	
-	public static String listenProducts(){
-		  System.out.println("-------------Escuchando Productos------------");   
-	        String direccionCliente="";
+	public static void listenProducts(){
+		  System.out.println("-------------Escuchando Productos------------");
+		  boolean flag = true;
+		  while(flag){
 	        try{
 	        	DatagramSocket socket =new DatagramSocket(8887);
 	            socket.setBroadcast(true);
@@ -28,9 +29,12 @@ public class Client {
 	            System.out.println("Ip recibida: "+paqueteRecibido.getAddress().getHostAddress());
 	            String productsString = new String(paqueteRecibido.getData());
 	            System.out.println("Productos: " + productsString);
-	            
+	
 	            socket.close();
-	            
+	            if(!paqueteRecibido.getAddress().getHostAddress().equals(dirServer)){
+	            	continue;
+	            }
+	            flag = false;
 	            String[] products = productsString.split(";");
 	            for(String s : products){	            	
 	            	String[] productInfo = s.split(",");	            	
@@ -44,11 +48,13 @@ public class Client {
 	        }catch (Exception e){
 	        
 	        }
-	    return direccionCliente;
+		  }
 	}
 	
 	public static void main(String[] args) {
-		dirServer = "127.0.0.1";
+		//change to real ip
+		//dirServer = "127.0.0.1";
+		dirServer = "10.5.2.45";
 		productMap = new HashMap<String, Integer>();
 		try {
 			DatagramSocket socket =new DatagramSocket();

@@ -6,6 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 public class StartServer {
@@ -14,11 +19,27 @@ public class StartServer {
 	private tReceiveClient receiveClients;
 	private HashMap<String, Integer> products;
 	
+	public void RegisterTransaction(){
+ 	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
+		System.setProperty("java.security.policy", "C:/Users/sala_a/workspace-kepler2/DistriTienda/ServerAlmacen/src/policy.policy");
+		if(System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+		Task t = new Transaction();
+		try {
+			Task engineStub = (Task)UnicastRemoteObject.exportObject(t, 0);
+			Registry registry = LocateRegistry.getRegistry();
+            registry.rebind("rmi://10.5.2.45:1500/Transaction", engineStub);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}	
+	}
 	
     public StartServer()  {
     	
     	try {
-			
+    		RegisterTransaction();
+    		System.out.println("----Registré Transaction-----------");
     		//read products from file
     		BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sala_a\\workspace-kepler2\\DistriTienda\\ServerAlmacen\\src\\products.txt"));
     		products = new HashMap<String, Integer>();
