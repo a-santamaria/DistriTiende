@@ -29,7 +29,7 @@ public class StartServer {
 		try {
 			Task engineStub = (Task)UnicastRemoteObject.exportObject(t, 0);
 			Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("rmi://10.5.2.45:1500/Transaction", engineStub);
+            registry.rebind("rmi://127.0.0.1:1099/Transaction", engineStub);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}	

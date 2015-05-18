@@ -4,6 +4,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.HashMap;
 
 
@@ -51,6 +55,27 @@ public class Client {
 		  }
 	}
 	
+	public static void buy(){
+		System.setProperty("java.security.policy",
+				"C:/Users/sala_a/workspace-kepler2/DistriTienda/ClientAlmacen/src/policy.policy");
+	   
+	
+		try {
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			Task task = (Task)registry.lookup("rmi://"+"127.0.0.1"+":1099/Transaction");
+			
+			task.buy();
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 	
+	}
+	
 	public static void main(String[] args) {
 		//change to real ip
 		//dirServer = "127.0.0.1";
@@ -66,6 +91,9 @@ public class Client {
             System.out.println("ya envie");
             socket.close();
             listenProducts();
+            
+            buy();
+            
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

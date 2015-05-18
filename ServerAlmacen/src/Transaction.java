@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 public class Transaction implements Task, Serializable {
 
-	public void Buy() throws RemoteException {
+	public void buy() throws RemoteException {
 		try {
 			System.out.println("hello server "+ InetAddress.getLocalHost().getHostAddress());
 		} catch (UnknownHostException e) {
