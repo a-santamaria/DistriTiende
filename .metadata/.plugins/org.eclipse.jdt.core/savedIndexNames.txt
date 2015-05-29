@@ -1,0 +1,3 @@
+INDEX VERSION 1.126+C:\Users\Nicolás\Documents\GitHub\DistriTiende\.metadata\.plugins\org.eclipse.jdt.core
+3604310524.index
+4195294089.index
