@@ -14,14 +14,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 public class StartServer {
-	
-
-	private tReceiveClient receiveClients;
 	private HashMap<String, Integer> products;
+	private String ipServer = "127.0.0.1";
+	
 	
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
-		System.setProperty("java.security.policy", "C:/Users/sala_a/workspace-kepler2/DistriTienda/ServerAlmacen/src/policy.policy");
+		System.setProperty("java.security.policy", "C:\\Users\\Nicolás\\Documents\\GitHub\\DistriTiende\\ServerAlmace\\src\\policy.policy");
 		if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
@@ -29,7 +28,7 @@ public class StartServer {
 		try {
 			Task engineStub = (Task)UnicastRemoteObject.exportObject(t, 0);
 			Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("rmi://127.0.0.1:1099/Transaction", engineStub);
+            registry.rebind("rmi://"+ipServer+":1099/Transaction", engineStub);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}	
@@ -38,24 +37,21 @@ public class StartServer {
     public StartServer()  {
     	
     	try {
+    		System.out.println("Iniciando Servidor");
     		RegisterTransaction();
-    		System.out.println("----Registré Transaction-----------");
-    		//read products from file
-    		BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sala_a\\workspace-kepler2\\DistriTienda\\ServerAlmacen\\src\\products.txt"));
+    		//Leer articulos del archivo
+    		BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Nicolás\\Documents\\GitHub\\DistriTiende\\ServerAlmacen\\src\\products.txt"));
     		products = new HashMap<String, Integer>();
 			String line;
 			while( (line = br.readLine()) != null ){
 				String[] curr = line.split(" ");
 				products.put(curr[0], Integer.parseInt(curr[1]));
 			}
-			
-			//thread receive new Clients
-			receiveClients = new tReceiveClient(products);
-	    	new Thread(receiveClients).start();
-	    	
-	    	
-			
-			
+			//Recibiendo Clientes en un hilo
+			tReceiveClient receiveClients = new tReceiveClient(products);
+	    	Thread thread = new Thread(receiveClients);
+	    	thread.start();
+			//
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,11 +62,6 @@ public class StartServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
-    	
-    	
-    	
-    	
     	
     }
 	

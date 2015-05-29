@@ -57,13 +57,14 @@ public class Client {
 	
 	public static void buy(){
 		System.setProperty("java.security.policy",
-				"C:/Users/sala_a/workspace-kepler2/DistriTienda/ClientAlmacen/src/policy.policy");
-	   
+				"C:\\Users\\Nicolás\\Documents\\GitHub\\DistriTiende/ClientAlmacen/src/policy.policy");
+		if(System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
 	
 		try {
 			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			Task task = (Task)registry.lookup("rmi://"+"127.0.0.1"+":1099/Transaction");
-			
+			Task task = (Task)registry.lookup("rmi://"+"127.0.0.1"+":1099/Transaction");	
 			task.buy();
 			
 		} catch (RemoteException e) {
@@ -79,7 +80,7 @@ public class Client {
 	public static void main(String[] args) {
 		//change to real ip
 		//dirServer = "127.0.0.1";
-		dirServer = "10.5.2.45";
+		dirServer = "127.0.0.1";
 		productMap = new HashMap<String, Integer>();
 		try {
 			DatagramSocket socket =new DatagramSocket();
