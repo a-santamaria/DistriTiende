@@ -1,0 +1,103 @@
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.HashMap;
+
+
+public class Client {
+
+	private static String dirServer = "127.0.0.1";;
+	private static String username = "yo";
+	private static String password;
+	private static HashMap<String, Integer> productMap;
+	
+	
+	public static void listenProducts(){
+		if (contactarServidor()){
+			  System.out.println("Agregando productos.");
+			  boolean flag = true;
+			  while(flag){
+		        try{
+		        	DatagramSocket socket =new DatagramSocket(8887);
+		            socket.setBroadcast(true);
+		            byte[] mensajeRecibido = new byte[15000];
+		            DatagramPacket paqueteRecibido=new DatagramPacket(mensajeRecibido, mensajeRecibido.length);
+		            socket.receive(paqueteRecibido);
+		            System.out.println("Ip recibida: "+paqueteRecibido.getAddress().getHostAddress());
+		            String productsString = new String(paqueteRecibido.getData());
+		            System.out.println("Productos: " + productsString);
+		            socket.close();
+		            if(!paqueteRecibido.getAddress().getHostAddress().equals(dirServer)){
+		            	continue;
+		            }
+		            flag = false;
+		            String[] products = productsString.split(";");
+		            for(String s : products){	            	
+		            	String[] productInfo = s.split(",");	            	
+		            	productMap.put(productInfo[0], 8));
+		            	System.out.println("mi");
+		            }
+		        }catch (Exception e){
+		        	System.out.println("Error:" + e.toString());
+		        }
+			  }
+		}
+	}
+	
+	public static boolean contactarServidor(){
+		
+		byte[] mensajeEnviar = username.getBytes();
+        DatagramPacket paqueteEnviar;
+        try {
+        	DatagramSocket socket =new DatagramSocket();
+        	paqueteEnviar = new DatagramPacket(mensajeEnviar, mensajeEnviar.length,InetAddress.getByName(dirServer),8888);	
+			socket.send(paqueteEnviar);
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("No se pudo contactar al servidor.");
+			e.printStackTrace();
+			return false;
+		}
+        System.out.println("Comunicación con el servidor: Sí");  
+        return true;
+	}
+	
+	public static void buy(){
+		System.setProperty("java.security.policy",
+				"C:\\Users\\Nicolás\\Documents\\GitHub\\DistriTiende/ClientAlmacen/src/policy.policy");
+		if(System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+	
+		try {
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			Task task = (Task)registry.lookup("rmi://"+"127.0.0.1"+":1099/Transaction");	
+			task.buy();	
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 	
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		productMap = new HashMap<String, Integer>();
+        
+        listenProducts();
+    
+        buy();
+	}
+
+}

@@ -40,6 +40,7 @@ public class tReceiveClient implements Runnable{
     	  if(ipCliente != null){
     		 //Enviar productos
     		  try {
+    			    Thread.sleep(200);
     				DatagramSocket socket =new DatagramSocket();
     				
     				StringBuilder productsString = new StringBuilder();
@@ -47,6 +48,7 @@ public class tReceiveClient implements Runnable{
     					productsString.append(e.getKey());
     					productsString.append(",");
     					productsString.append(e.getValue());
+    					productsString.append(",");
     					productsString.append(";");
     				}
     				
@@ -64,7 +66,10 @@ public class tReceiveClient implements Runnable{
     			} catch (IOException e) {
     				// TODO Auto-generated catch block
     				e.printStackTrace();
-    			}
+    			} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
     	  }
       }
     }
