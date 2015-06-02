@@ -57,7 +57,7 @@ public class Client {
 	
 	public static void buy(){
 		System.setProperty("java.security.policy",
-				"C:/Users/sala_a/workspace-kepler2/DistriTienda/ClientAlmacen/src/policy.policy");
+				"C:/Users/alfredo/Documents/distribuidos/Proyecto/DistriTiende/ClientAlmacen/src/policy.policy");
 	   
 	
 		try {
@@ -79,10 +79,35 @@ public class Client {
 	public static void main(String[] args) {
 		//change to real ip
 		//dirServer = "127.0.0.1";
-		dirServer = "10.5.2.45";
+		dirServer = "10.150.20.100";
 		productMap = new HashMap<String, Integer>();
+		
+		Registry registro;
 		try {
-			DatagramSocket socket =new DatagramSocket();
+			/*registro = LocateRegistry.getRegistry("10.150.20.100",1099);
+			InterfazServidor rmiServidor = (InterfazServidor) (registro.lookup("rmiServer")); 
+			
+			
+			productMap = rmiServidor.startTransaction("100.0.0.0");*/
+			
+			
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			InterfazServidor rmiServer = (InterfazServidor)registry.lookup("rmi://"+"127.0.0.1"+":1099/rmiServer");
+			
+			productMap = rmiServer.startTransaction("hola");
+			
+			System.out.println(productMap.size());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
+		/*try {
+			/*DatagramSocket socket =new DatagramSocket();
 			byte[] mensajeEnviar = username.getBytes();
             DatagramPacket paqueteEnviar= new DatagramPacket(mensajeEnviar, mensajeEnviar.length,
             		InetAddress.getByName(dirServer),8888);
@@ -92,7 +117,7 @@ public class Client {
             socket.close();
             listenProducts();
             
-            buy();
+            buy();* /
             
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
@@ -103,7 +128,7 @@ public class Client {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 
 	}

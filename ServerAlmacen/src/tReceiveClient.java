@@ -47,7 +47,6 @@ public class tReceiveClient implements Runnable{
     	  String add = listenNewClients();
     	  if(add != null){
     		  SendProducts sendProductsToClient = new SendProducts(add, products);
-    		  sendProductsToClient.run();
     	  }
       }
     

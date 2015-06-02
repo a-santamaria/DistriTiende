@@ -2,6 +2,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 
 public class Transaction implements Task, Serializable {
@@ -14,5 +15,5 @@ public class Transaction implements Task, Serializable {
 		}
 
 	}
-
+	
 }
