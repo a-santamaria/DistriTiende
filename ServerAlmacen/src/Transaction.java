@@ -17,6 +17,7 @@ public class Transaction {
 		escribio = false;
 		idInicio = -1;
 		idFin = -1;
+		cart = new HashMap<String, Integer>();
 	}
 	
 	void yaEscribi(){
