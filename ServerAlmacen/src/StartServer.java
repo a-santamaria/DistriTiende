@@ -27,6 +27,7 @@ public class StartServer implements InterfazServidor{
 	private HashMap<String, Integer> products;
 	private ArrayList<Transaction> transactions;
 	private static int idTransaction;
+	private String ipServer;
 	
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
@@ -40,13 +41,10 @@ public class StartServer implements InterfazServidor{
 		try {			
 			InterfazServidor engineStub2 = (InterfazServidor)UnicastRemoteObject.exportObject(this, 0);
 			Registry registry2 = LocateRegistry.getRegistry();
-			String ip = InetAddress.getLocalHost().getHostAddress();
-            registry2.rebind("rmi://"+"localhost"+":1099/rmiServer", engineStub2);
+			
+            registry2.rebind("rmi://"+ipServer+":1099/rmiServer", engineStub2);
             
 		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
@@ -55,7 +53,10 @@ public class StartServer implements InterfazServidor{
     	
     	transactions = new ArrayList<Transaction>();
     	this.idTransaction = 0;
+    	
     	try {
+    		ipServer = InetAddress.getLocalHost().getHostAddress();
+    		System.out.println("ipServer: "+ipServer);
     		RegisterTransaction();
     		System.out.println("----Registré Transaction-----------");
     		//read products from file

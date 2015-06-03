@@ -12,7 +12,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale.Category;
+import java.util.Map.Entry;
 
 public class Client {
 
@@ -21,31 +24,59 @@ public class Client {
 	private static String password;
 	private static HashMap<String, Integer> productMap;
 	private static Integer idTransaction;
+	private static BufferedReader br;
+	private static HashMap<String, Integer> cart;
+	private static InterfazServidor rmiServer;
 
+	public static void main(String[] args) {
+		
+		idTransaction = -1;
+		cart = new HashMap();
+		br = new BufferedReader(new InputStreamReader(System.in));
+
+		String opcion = "-1";
+		do {
+			System.out.println("Seleccione la Opción: ");
+			System.out.println("1 - Registrarse");
+			System.out.println("2 - Iniciar Sección");
+			System.out.println("3 - Agregar Productos a Carrito");
+			System.out.println("4 - Mostrar Carrito");
+			System.out.println("5 - Salir");
+			try {
+				opcion = br.readLine();
+			
+
+				switch (opcion) {
 	
+				case "1":
+					
+					break;
+				case "2":
+					startTransaction();
+					System.out.println("Transaccion Iniciada con id = "+ idTransaction);
+					break;
 	
+				case "3":
+					agregarProductos();
+					break;
+				case "4":
+				
+					break;
 	
-	public static void buy() {
-		System.setProperty(
-				"java.security.policy",
-				"C:/Users/alfredo/Documents/distribuidos/Proyecto/DistriTiende/ClientAlmacen/src/policy.policy");
-
-		try {
-			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			Task task = (Task) registry.lookup("rmi://" + "127.0.0.1"
-					+ ":1099/Transaction");
-
-			task.buy();
-
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+				case "5":
+					System.out.println("--CHAO--");
+					break;
+				default:
+					System.err.println("--OPCION INVALIDA--");
+					break;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} while (!opcion.equals("5"));
 
 	}
+
 
 	public static void startTransaction() {
 		// change to real ip
@@ -55,7 +86,7 @@ public class Client {
 		try {
 
 			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			InterfazServidor rmiServer = (InterfazServidor) registry
+			rmiServer = (InterfazServidor) registry
 					.lookup("rmi://" + dirServer + ":1099/rmiServer");
 
 			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
@@ -78,54 +109,57 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-
-	public static void main(String[] args) {
+	
+	private static void agregarProductos() {
 		
-		idTransaction = -1;
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-		String opcion = "-1";
-		do {
-			System.out.println("Seleccione la Opción: ");
-			System.out.println("1 - Registrarse");
-			System.out.println("2 - Iniciar Sección");
-			System.out.println("3 - Seleccionar Productos");
-			System.out.println("4 - Mostrar Carrito");
-			System.out.println("5 - Salir");
-			try {
-				opcion = br.readLine();
-			
-
-				switch (opcion) {
-	
-				case "1":
-					
-					break;
-				case "2":
-					startTransaction();
-					System.out.println("id Transaction: " + idTransaction);
-					break;
-	
-				case "3":
-	
+		ArrayList<String> idProductos = new ArrayList<String>();
+		while(true){
+			int i = 0;
+			for(Entry<String, Integer> e : productMap.entrySet()){
+				idProductos.add(e.getKey());
+				System.out.format("%d: %20s %10s", i++, e.getKey(), e.getValue());
 				
-					break;
-				case "4":
-				
-					break;
-	
-				case "5":
-					System.out.println("--CHAO--");
-					break;
-				default:
-					System.err.println("--OPCION INVALIDA--");
-					break;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
-		} while (!opcion.equals("5"));
-
+			System.out.println("-1 Salir");
+			try {
+				System.out.println("digite el numero de producto que quiere agregar:");
+				String identi = br.readLine();
+				if(identi == "-1") break;
+				
+				System.out.println("digite la cantidad:");
+				String cantidad = br.readLine();
+				
+				int id = Integer.parseInt(identi);
+				int cant = Integer.parseInt(cantidad);
+				
+				if(id >= productMap.size()){
+					System.err.println("no existe el producto con id "+id);
+					continue;
+				}
+				
+				if(cant <= 0 || cant > productMap.get(idProductos.get(id))){
+					System.err.println("cantidad incorrecta");
+					continue;
+				}
+				
+				if(!cart.containsKey(idProductos.get(i))){
+					int newValue = productMap.get(idProductos.get(i)) - cant;
+					productMap.put(idProductos.get(id), newValue);
+					cart.put(idProductos.get(i), cant);
+					
+					rmiServer.addToCart(idTransaction, idProductos.get(i), cant);
+				}else{
+					int newValue = productMap.get(idProductos.get(i)) - cant;
+					productMap.put(idProductos.get(id), newValue);
+					cart.put(idProductos.get(i), cart.get(idProductos.get(i))+cant);
+					
+					rmiServer.modifyItem(idTransaction, idProductos.get(i), cant);
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
 	}
 
 }
