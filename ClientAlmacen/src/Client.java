@@ -45,7 +45,8 @@ public class Client {
 			System.out.println("2 - Iniciar Sección");
 			System.out.println("3 - Agregar Productos a Carrito");
 			System.out.println("4 - Mostrar Carrito");
-			System.out.println("5 - Salir");
+			System.out.println("5 - Comprar");
+			System.out.println("6 - Salir");
 			try {
 				opcion = br.readLine();
 			
@@ -64,10 +65,11 @@ public class Client {
 					agregarProductos();
 					break;
 				case "4":
-				
+					mostrarCarrito();
 					break;
-	
 				case "5":
+					break;
+				case "6":
 					System.out.println("--CHAO--");
 					break;
 				default:
@@ -77,12 +79,95 @@ public class Client {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} while (!opcion.equals("5"));
+		} while (!opcion.equals("6"));
 
 	}
 		
 		
 		
+	private static void mostrarCarrito() {
+		
+		while(true){
+			System.out.println("-----------CARRITO DE COMPRAS-------------");
+			ArrayList<String> idProductos = new ArrayList<String>();
+			int i = 0;
+			for(Entry<String, Integer> e : cart.entrySet()){
+				idProductos.add( e.getKey());
+				System.out.format("%d : %15s %5s",i++, e.getKey(), e.getValue());
+				System.out.println("");
+			}
+			System.out.println("-----------------------------------------");
+			
+			
+			System.out.println("Seleccione la Opción: ");
+			System.out.println("1 - Eliminar producto");
+			System.out.println("2 - Modificar producto");
+			System.out.println("-1 - Volver a menú");
+			
+			
+			try {
+				String opcion = br.readLine();
+				
+				if(opcion.equals(-1)) return;
+				switch (opcion) {
+				
+				case "1":
+					System.out.println("digite el id del producto que quiere eliminar");
+					int idEliminar = Integer.parseInt(br.readLine());
+					
+					if(idEliminar < 0 || idEliminar >= idProductos.size()){
+						System.err.println("id incorrecto");
+						break;
+					}
+					
+					productMap.put(idProductos.get(idEliminar), productMap.get(idProductos.get(idEliminar)) 
+							+ cart.get(idProductos.get(idEliminar)));
+					cart.remove(idProductos.get(idEliminar));
+					
+					rmiServer.deleteItem(idTransaction, idProductos.get(idEliminar));
+					
+					break;
+				case "2":
+					
+					System.out.println("digite el id del producto que quiere modificar");
+					String identi = br.readLine();
+					int idModificar = Integer.parseInt(identi);
+					if(idModificar < 0 || idModificar >= idProductos.size()){
+						System.err.println("id incorrecto");
+						break;
+					}
+					
+					System.out.println("digite la modificacion :");
+					String nuevacantidad = br.readLine();
+					int modificacion = Integer.parseInt(nuevacantidad);
+					
+					if(cart.get(idProductos.get(idModificar))+ modificacion < 0 | 
+							modificacion > productMap.get(idProductos.get(idModificar))){
+						System.err.println("valor de modificacion incorrecto");
+						break;
+					}
+					
+					
+					int newValue = productMap.get(idProductos.get(idModificar))- modificacion;
+					productMap.put(idProductos.get(idModificar), newValue);
+					cart.put(idProductos.get(idModificar), cart.get(idProductos.get(idModificar))+modificacion);
+					
+					rmiServer.modifyItem(idTransaction, idProductos.get(idModificar), modificacion);
+					break;
+				default:
+					System.err.println("--OPCION INVALIDA--");
+					break;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		
+		}
+	}
+
+
+
 	public static void startTransaction() {
 		// change to real ip
 		dirServer = "192.168.0.7";
@@ -122,14 +207,14 @@ public class Client {
 			int i = 0;
 			for(Entry<String, Integer> e : productMap.entrySet()){
 				idProductos.add(e.getKey());
-				System.out.format("%d: %20s %10s", i++, e.getKey(), e.getValue());
+				System.out.format("%d: %15s %5s", i++, e.getKey(), e.getValue());
 				System.out.println("");
 			}
-			System.out.println("-1 Salir");
+			System.out.println("-1 Volver a menú");
 			try {
 				System.out.println("digite el numero de producto que quiere agregar:");
 				String identi = br.readLine();
-				if(identi == "-1") break;
+				if(identi.equals("-1")) return;
 				
 				System.out.println("digite la cantidad:");
 				String cantidad = br.readLine();
