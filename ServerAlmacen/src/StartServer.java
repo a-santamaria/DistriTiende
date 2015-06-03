@@ -54,6 +54,7 @@ public class StartServer implements InterfazServidor{
     public StartServer() throws RemoteException {
     	
     	transactions = new ArrayList<Transaction>();
+    	this.idTransaction = 0;
     	try {
     		RegisterTransaction();
     		System.out.println("----Registré Transaction-----------");
@@ -79,7 +80,7 @@ public class StartServer implements InterfazServidor{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	this.idTransaction = 0;
+    	
     	
     }
     
@@ -93,10 +94,11 @@ public class StartServer implements InterfazServidor{
 		}
     }
 
-	public HashMap startTransaction(Object ip) throws RemoteException {
+	public InfoTransaction startTransaction(Object ip) throws RemoteException {
 		System.out.println("nuevo cliente ip: "+ ip );
 		transactions.add(new Transaction((String)ip, idTransaction++));
-		return products;
+		
+		return new InfoTransaction(products, idTransaction-1);
 	}
 
 	

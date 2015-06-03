@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,9 +13,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
-
 
 public class Client {
 
@@ -19,19 +20,23 @@ public class Client {
 	private static String username = "yo";
 	private static String password;
 	private static HashMap<String, Integer> productMap;
+	private static Integer idTransaction;
+
 	
 	
-	public static void buy(){
-		System.setProperty("java.security.policy",
+	
+	public static void buy() {
+		System.setProperty(
+				"java.security.policy",
 				"C:/Users/alfredo/Documents/distribuidos/Proyecto/DistriTiende/ClientAlmacen/src/policy.policy");
-	   
-	
+
 		try {
 			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			Task task = (Task)registry.lookup("rmi://"+"127.0.0.1"+":1099/Transaction");
-			
+			Task task = (Task) registry.lookup("rmi://" + "127.0.0.1"
+					+ ":1099/Transaction");
+
 			task.buy();
-			
+
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,38 +44,29 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	 	
+
 	}
-	
-	public static void main(String[] args) {
-		//change to real ip
-		//dirServer = "127.0.0.1";
+
+	public static void startTransaction() {
+		// change to real ip
 		dirServer = "localhost";
 		productMap = new HashMap<String, Integer>();
-		
-		Registry registro;
+
 		try {
-			/*registro = LocateRegistry.getRegistry("10.150.20.100",1099);
-			InterfazServidor rmiServidor = (InterfazServidor) (registro.lookup("rmiServer")); 
-			
-			
-			productMap = rmiServidor.startTransaction("100.0.0.0");*/
-			
-			
+
 			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			InterfazServidor rmiServer = (InterfazServidor)registry.lookup("rmi://"+dirServer+":1099/rmiServer");
+			InterfazServidor rmiServer = (InterfazServidor) registry
+					.lookup("rmi://" + dirServer + ":1099/rmiServer");
+
+			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
+					.getHostAddress());
 			
-			productMap = rmiServer.startTransaction(InetAddress.getLocalHost().getHostAddress());
-			
-			
-			
-			
+			productMap = info.products;
+			idTransaction = info.idTransaction;
 			/*
-			 Set<String> keys = productMap.keySet();
-			 for(String s : keys){
-				System.out.println(s);
-				System.out.println(productMap.get(s));
-			}*/
+			 * Set<String> keys = productMap.keySet(); for(String s : keys){
+			 * System.out.println(s); System.out.println(productMap.get(s)); }
+			 */
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,9 +77,54 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
+	}
 
+	public static void main(String[] args) {
 		
+		idTransaction = -1;
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+		String opcion = "-1";
+		do {
+			System.out.println("Seleccione la Opción: ");
+			System.out.println("1 - Registrarse");
+			System.out.println("2 - Iniciar Sección");
+			System.out.println("3 - Seleccionar Productos");
+			System.out.println("4 - Mostrar Carrito");
+			System.out.println("5 - Salir");
+			try {
+				opcion = br.readLine();
+			
+
+				switch (opcion) {
+	
+				case "1":
+					
+					break;
+				case "2":
+					startTransaction();
+					System.out.println("id Transaction: " + idTransaction);
+					break;
+	
+				case "3":
+	
+				
+					break;
+				case "4":
+				
+					break;
+	
+				case "5":
+					System.out.println("--CHAO--");
+					break;
+				default:
+					System.err.println("--OPCION INVALIDA--");
+					break;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} while (!opcion.equals("5"));
 
 	}
 
