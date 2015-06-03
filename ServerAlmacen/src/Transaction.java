@@ -1,19 +1,26 @@
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 
 
-public class Transaction implements Task, Serializable {
-
-	public void buy() throws RemoteException {
-		try {
-			System.out.println("hello server "+ InetAddress.getLocalHost().getHostAddress());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-
+public class Transaction {
+	public String ip;
+	public int id;
+	public boolean escribio;
+	HashMap<String, Integer> cart;
+	
+	
+	
+	public Transaction(String ip, int id) {
+		super();
+		this.ip = ip;
+		this.id = id;
+		escribio = false;
 	}
 	
+	void yaEscribi(){
+		escribio = true;
+	}
+	
+	void addToCart(String product, int cant){
+		cart.put(product, cant);
+	}
 }

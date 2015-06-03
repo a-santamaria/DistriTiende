@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StartServer implements InterfazServidor{
@@ -20,8 +21,8 @@ public class StartServer implements InterfazServidor{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private tReceiveClient receiveClients;
 	private HashMap<String, Integer> products;
+	private ArrayList<Transaction> transactions;
 	
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
@@ -31,20 +32,12 @@ public class StartServer implements InterfazServidor{
 		if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-		Task t = new Transaction();
-		try {
-			/*Task engineStub = (Task)UnicastRemoteObject.exportObject(t, 0);
-			Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("rmi://127.0.0.1:1099/Transaction", engineStub);
-            */
-			
+		
+		try {			
 			InterfazServidor engineStub2 = (InterfazServidor)UnicastRemoteObject.exportObject(this, 0);
 			Registry registry2 = LocateRegistry.getRegistry();
             registry2.rebind("rmi://127.0.0.1:1099/rmiServer", engineStub2);
             
-            
-            /*Registry registro = LocateRegistry.createRegistry(3232);
-            registro.rebind("rmiServidor", this);*/
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}	
@@ -64,11 +57,6 @@ public class StartServer implements InterfazServidor{
 				String[] curr = line.split(" ");
 				products.put(curr[0], Integer.parseInt(curr[1]));
 			}
-			
-			//thread receive new Clients
-			/*receiveClients = new tReceiveClient(products);
-	    	new Thread(receiveClients).start();
-	    	*/
 	    	
 			
 			
@@ -98,6 +86,25 @@ public class StartServer implements InterfazServidor{
 
 	public HashMap startTransaction(Object ip) throws RemoteException {
 		System.out.println("nuevo cliente ip: "+ ip );
+		transactions.add(new Transaction((String)ip, transactions.size()));
 		return products;
 	}
+
+	
+
+	public void addToCart(int idTransaction, Object producto, int cantidad)
+			throws RemoteException {
+			transactions.get(idTransaction).addToCart((String)producto, cantidad);
+			transactions.get(idTransaction).yaEscribi();
+	}
+	
+	
+	public void buy(int idTransaction){
+		
+	}
 }
+
+
+
+
+
