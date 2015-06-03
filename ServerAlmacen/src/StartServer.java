@@ -1,11 +1,17 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.Remote;
@@ -55,8 +61,35 @@ public class StartServer implements InterfazServidor{
     	
     	transactions = new HashMap<Integer, Transaction>();
     	this.idTransaction = 0;
-    	userPass = new HashMap<String, String>();
-    	userPass.put("user", "user");
+    	
+    	
+    	
+    	FileInputStream fin;
+		try {
+			File f = new File("users");
+			if(f.exists()){
+				fin = new FileInputStream("users");
+				ObjectInputStream ois = new ObjectInputStream(fin);
+		    	userPass = (HashMap<String, String>) ois.readObject();
+			}else{
+				userPass = new HashMap<String, String>();
+		    	userPass.put("user", "user");
+		    	seveUsersToFile();
+			}
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	
+    	
     	try {
     		ipServer = InetAddress.getLocalHost().getHostAddress();
     		System.out.println("ipServer: "+ipServer);
@@ -89,6 +122,23 @@ public class StartServer implements InterfazServidor{
     }
     
 	
+	private void seveUsersToFile() {
+		FileOutputStream fout;
+		try {
+			fout = new FileOutputStream("users");
+			ObjectOutputStream oos = new ObjectOutputStream(fout);
+			oos.writeObject(userPass);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+
 	public static void main(String[] args) {
         try {
 			new StartServer();
@@ -100,8 +150,8 @@ public class StartServer implements InterfazServidor{
 
 	public InfoTransaction startTransaction(Object ip) throws RemoteException {
 		System.out.println("nuevo cliente ip: "+ ip );
-		transactions.put(idTransaction,new Transaction((String)ip, idTransaction++));
-		
+		transactions.put(idTransaction,new Transaction((String)ip, idTransaction));
+		idTransaction++;
 		return new InfoTransaction(products, idTransaction-1);
 	}
 
@@ -133,7 +183,11 @@ public class StartServer implements InterfazServidor{
 		Set<Integer> key = transactions.keySet();
 		for(Integer i : key){
 			Transaction t = transactions.get(i);
-			if(t.getFin())
+			//System.out.println(t.getId() + " " +idTransaction+" "+i + t.getIp());
+			if ( t.getId() == idTransaction)
+				continue;
+			
+			if(t.getFin() )
 				continue;
 			
 			if(t.getId() >= idTransaction ||
@@ -142,14 +196,29 @@ public class StartServer implements InterfazServidor{
 			
 			
 			if(t.isEscribio()){
+				System.out.println(t.getIp());
 				return false;
 			}
 			
 		}
 		//actualizar productos
 		for(Entry<String, Integer> e : transactions.get(idTransaction).getCart().entrySet()){
-			products.put(e.getKey(), products.get(e.getValue())-e.getValue());
+			products.put(e.getKey(), products.get(e.getKey())-e.getValue());
 		}
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter("products.txt"));
+			for(Entry<String, Integer> e : products.entrySet()){
+				bw.write(e.getKey() + " "+e.getValue());
+				bw.write("\n");
+			}
+			bw.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		return true;		
 	}
 
@@ -169,6 +238,7 @@ public class StartServer implements InterfazServidor{
 			String key = (String) user;
 			String value = (String) passwd;
 			userPass.put(key, value);
+			seveUsersToFile();
 			return true;
 		}
 		

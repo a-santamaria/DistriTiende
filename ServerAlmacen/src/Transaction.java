@@ -15,7 +15,6 @@ public class Transaction {
 		this.ip = ip;
 		this.idInicio = id;
 		escribio = false;
-		idInicio = -1;
 		idFin = -1;
 		fin = false;
 		cart = new HashMap<String, Integer>();
