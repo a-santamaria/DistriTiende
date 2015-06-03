@@ -7,7 +7,7 @@ public class Transaction {
 	private int idFin;
 	private boolean escribio;
 	private HashMap<String, Integer> cart;
-	private boolean fin;
+	private Boolean fin;
 	
 	
 	public Transaction(String ip, int id) {
@@ -19,6 +19,13 @@ public class Transaction {
 		idFin = -1;
 		fin = false;
 		cart = new HashMap<String, Integer>();
+		Timeout t = new Timeout(this);
+		Thread th = new Thread(t);
+		th.start();
+	}
+	
+	boolean getFin(){
+		return fin.booleanValue();
 	}
 	
 	void yaEscribi(){
@@ -85,6 +92,11 @@ public class Transaction {
 	public void updateItem(String producto, int num) {
 		cart.put(producto, cart.get(producto)+num);
 		
+	}
+
+	public void setFin(boolean b) {
+		// TODO Auto-generated method stub
+		fin = b;
 	}
 	
 	

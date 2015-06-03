@@ -93,6 +93,12 @@ public class Client {
 					mostrarCarrito();
 					break;
 				case "5":
+					if (comprar()){
+						System.out.println("La transaccion ha finalizado");
+					}else{
+						System.out.println("La transaccion ha fallado");
+					}
+					opcion = "6";
 					break;
 				case "6":
 					System.out.println("--CHAO--");
@@ -151,6 +157,49 @@ public class Client {
 		return false;
 	}
 	
+	private static boolean comprar(){
+		String user ="";
+		String passwd="";		
+		
+		dirServer = "192.168.0.7";
+			
+		try {	
+			System.out.println("Usuario: ");
+			user = br.readLine();	
+			System.out.println("Pass: ");
+			passwd = br.readLine();
+		
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+
+		try {
+
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			rmiServer = (InterfazServidor) registry
+					.lookup("rmi://" + dirServer + ":1099/rmiServer");
+
+			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
+					.getHostAddress());
+			return rmiServer.buy(idTransaction.intValue());
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+		
+		
+		
+	}
 	
 	private static boolean registrarse (){
 		String user ="";
@@ -175,17 +224,12 @@ public class Client {
 			rmiServer = (InterfazServidor) registry
 					.lookup("rmi://" + dirServer + ":1099/rmiServer");
 
-			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
-					.getHostAddress());
 			return rmiServer.signin(user, passwd);
 
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

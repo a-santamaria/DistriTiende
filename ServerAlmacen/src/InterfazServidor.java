@@ -10,4 +10,5 @@ public interface InterfazServidor<String, Integer>  extends Remote{
 	  public void modifyItem(int idTransaction, Object producto, int num) throws RemoteException;
 	  public boolean login (String user,String passwd)throws RemoteException;
 	  public boolean signin (String user,String passwd)throws RemoteException;
+	  public boolean buy(int idTransaction)throws RemoteException;
 }

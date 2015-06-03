@@ -129,6 +129,8 @@ public class StartServer implements InterfazServidor{
 		int idFin = idTransaction++;
 		transactions.get(idTransaction).setIdFin(idFin);
 		for(Transaction t : transactions){
+			if(t.getFin())
+				continue;
 			
 			if(t.getId() >= idTransaction ||
 			  (t.getIdFin() != -1 && t.getIdFin() < idFin))
