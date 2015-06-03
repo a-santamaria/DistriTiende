@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -13,6 +15,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class StartServer implements InterfazServidor{
 	
@@ -37,15 +40,20 @@ public class StartServer implements InterfazServidor{
 		try {			
 			InterfazServidor engineStub2 = (InterfazServidor)UnicastRemoteObject.exportObject(this, 0);
 			Registry registry2 = LocateRegistry.getRegistry();
-            registry2.rebind("rmi://127.0.0.1:1099/rmiServer", engineStub2);
+			String ip = InetAddress.getLocalHost().getHostAddress();
+            registry2.rebind("rmi://"+"localhost"+":1099/rmiServer", engineStub2);
             
 		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
 	
     public StartServer() throws RemoteException {
     	
+    	transactions = new ArrayList<Transaction>();
     	try {
     		RegisterTransaction();
     		System.out.println("----Registré Transaction-----------");
@@ -100,7 +108,18 @@ public class StartServer implements InterfazServidor{
 	}
 	
 	
-	public void buy(int idTransaction){
+	public void deleteItem(int idTransaction, Object producto){
+		transactions.get(idTransaction).removeFromCart((String)producto);
+		transactions.get(idTransaction).yaEscribi();
+	}
+	
+	public void modifyItem(int idTransaction, Object producto, int num){
+		transactions.get(idTransaction).updateItem((String) producto, num);
+		transactions.get(idTransaction).yaEscribi();
+	}
+	
+	
+	public boolean buy(int idTransaction){
 		
 		int idFin = idTransaction++;
 		transactions.get(idTransaction).setIdFin(idFin);
@@ -111,10 +130,17 @@ public class StartServer implements InterfazServidor{
 				continue;
 			
 			
+			if(t.isEscribio()){
+				return false;
+			}
 			
 		}
 		
-		
+		//actualizar productos
+		for(Entry<String, Integer> e : transactions.get(idTransaction).getCart().entrySet()){
+			products.put(e.getKey(), products.get(e.getValue())-e.getValue());
+		}
+		return true;		
 	}
 }
 

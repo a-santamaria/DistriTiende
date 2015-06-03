@@ -74,6 +74,16 @@ public class Transaction {
 	public void setIdFin(int idFin) {
 		this.idFin = idFin;
 	}
+
+	public void removeFromCart(String producto) {
+		cart.remove(producto);
+		
+	}
+
+	public void updateItem(String producto, int num) {
+		cart.put(producto, cart.get(producto)+num);
+		
+	}
 	
 	
 }

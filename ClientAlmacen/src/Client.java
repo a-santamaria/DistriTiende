@@ -45,7 +45,7 @@ public class Client {
 	public static void main(String[] args) {
 		//change to real ip
 		//dirServer = "127.0.0.1";
-		dirServer = "10.150.20.100";
+		dirServer = "localhost";
 		productMap = new HashMap<String, Integer>();
 		
 		Registry registro;
@@ -58,14 +58,16 @@ public class Client {
 			
 			
 			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
-			InterfazServidor rmiServer = (InterfazServidor)registry.lookup("rmi://"+"127.0.0.1"+":1099/rmiServer");
+			InterfazServidor rmiServer = (InterfazServidor)registry.lookup("rmi://"+dirServer+":1099/rmiServer");
 			
 			productMap = rmiServer.startTransaction(InetAddress.getLocalHost().getHostAddress());
 			
 			
-			Set<String> keys = productMap.keySet();
 			
-			/*for(String s : keys){
+			
+			/*
+			 Set<String> keys = productMap.keySet();
+			 for(String s : keys){
 				System.out.println(s);
 				System.out.println(productMap.get(s));
 			}*/
