@@ -123,7 +123,7 @@ public class Client {
 			for(Entry<String, Integer> e : productMap.entrySet()){
 				idProductos.add(e.getKey());
 				System.out.format("%d: %20s %10s", i++, e.getKey(), e.getValue());
-				
+				System.out.println("");
 			}
 			System.out.println("-1 Salir");
 			try {
