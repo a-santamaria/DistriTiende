@@ -40,7 +40,7 @@ public class StartServer implements InterfazServidor{
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
 		//System.setProperty("java.security.policy", "C:/Users/sala_a/workspace-kepler2/DistriTienda/ServerAlmacen/src/policy.policy");
-		System.setProperty("java.security.policy", "C:/Users/alfredo/Documents/distribuidos/Proyecto/DistriTiende/ServerAlmacen/src/policy.policy");
+		System.setProperty("java.security.policy", "policy.policy");
 		
 		if(System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
@@ -102,6 +102,7 @@ public class StartServer implements InterfazServidor{
 			String line;
 			while( (line = br.readLine()) != null ){
 				String[] curr = line.split(" ");
+				System.out.println(line);
 				products.put(curr[0], Integer.parseInt(curr[1]));
 			}
 	    	
@@ -149,7 +150,7 @@ public class StartServer implements InterfazServidor{
     }
 
 	public InfoTransaction startTransaction(Object ip) throws RemoteException {
-		System.out.println("nuevo cliente ip: "+ ip );
+		System.out.println("Inicio Transaccion cliente ip: "+ ip );
 		transactions.put(idTransaction,new Transaction((String)ip, idTransaction));
 		idTransaction++;
 		return new InfoTransaction(products, idTransaction-1);
@@ -161,25 +162,35 @@ public class StartServer implements InterfazServidor{
 			throws RemoteException {
 			transactions.get(idTransaction).addToCart((String)producto, cantidad);
 			transactions.get(idTransaction).yaEscribi();
+			System.out.println("Transaccion "+ idTransaction+" agrego "+(String)producto+" cantidad: "+cantidad);
 	}
 	
 	
 	public void deleteItem(int idTransaction, Object producto){
 		transactions.get(idTransaction).removeFromCart((String)producto);
 		transactions.get(idTransaction).yaEscribi();
+		System.out.println("Transaccion "+ idTransaction+" elimino "+(String)producto);
 	}
 	
 	public void modifyItem(int idTransaction, Object producto, int num){
 		transactions.get(idTransaction).updateItem((String) producto, num);
 		transactions.get(idTransaction).yaEscribi();
+		System.out.println("Transaccion "+ idTransaction+" modifico "+(String)producto + " en "+num);
 	}
 	
 	
 	public boolean buy(int idTransaction){
+		//System.out.println("iii"+transactions.get(idTransaction));
+		if (transactions.get(idTransaction).getFin()){
+			System.err.println("Error: No se pudo consumar la transaccion");
+			return false;
+		}
 		
 		int idFin = this.idTransaction++;
 		transactions.get(idTransaction).setIdFin(idFin);
 		transactions.get(idTransaction).stop();
+		
+		
 		Set<Integer> key = transactions.keySet();
 		for(Integer i : key){
 			Transaction t = transactions.get(i);
@@ -187,22 +198,29 @@ public class StartServer implements InterfazServidor{
 			if ( t.getId() == idTransaction)
 				continue;
 			
-			if(t.getFin() )
+			if(t.getIdFin()!=1&&(t.getIdFin() < transactions.get(idTransaction).getId()))
 				continue;
 			
-			if(t.getId() >= idTransaction ||
-			  (t.getIdFin() != -1 && t.getIdFin() < idFin))
+			if(t.getId() > idTransaction )
 				continue;
-			
 			
 			if(t.isEscribio()){
-				System.out.println(t.getIp());
+				//System.out.println(t.getIp());
+				System.err.println("No se pudo consumar la transaccion");
+				return false;
+			}
+			t.Fin();
+			//System.out.println("ior"+t);
+		}
+		//actualizar productos
+		System.out.println("Transaccion consumada: ");
+		for(Entry<String, Integer> e : transactions.get(idTransaction).getCart().entrySet()){
+			System.out.println(e.getKey() +" -> cantidad:"+e.getValue());
+			if (products.get(e.getKey())-e.getValue() < 0){
+				System.err.println("No se pudo consumar la transaccion");
 				return false;
 			}
 			
-		}
-		//actualizar productos
-		for(Entry<String, Integer> e : transactions.get(idTransaction).getCart().entrySet()){
 			products.put(e.getKey(), products.get(e.getKey())-e.getValue());
 		}
 		
@@ -217,14 +235,14 @@ public class StartServer implements InterfazServidor{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
+		printProduts();
 		return true;		
 	}
 
 	public boolean login(Object user, Object passwd) throws RemoteException {
 		if (userPass.containsKey(user)){
 			if (userPass.get(user).equals(passwd)){
+				System.out.println("inicio de sesion usuario:"+user);
 				return true;
 			}
 		}
@@ -239,11 +257,19 @@ public class StartServer implements InterfazServidor{
 			String value = (String) passwd;
 			userPass.put(key, value);
 			seveUsersToFile();
+			System.out.println("Registro nuevo usuario usuario: "+user);
 			return true;
 		}
 		
 	}
 
+	public void printProduts(){
+		System.out.println("-------------PRODUCTOS-------------");
+		for(Entry<String, Integer> e: products.entrySet()){
+			System.out.println(e.getKey()+": "+e.getValue());
+		}
+		System.out.println("-----------------------------------");
+	}
 }
 
 

@@ -102,6 +102,11 @@ public class Transaction {
 			th.stop();
 	
 	}
+
+	public void Fin() {
+		// TODO Auto-generated method stub
+		fin = true;
+	}
 	
 	
 }
