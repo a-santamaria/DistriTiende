@@ -138,8 +138,6 @@ public class Client {
 			rmiServer = (InterfazServidor) registry
 					.lookup("rmi://" + dirServer + ":1099/rmiServer");
 
-			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
-					.getHostAddress());
 			return rmiServer.login(user, passwd);
 
 		} catch (RemoteException e) {
@@ -148,26 +146,20 @@ public class Client {
 		} catch (NotBoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		
 		
 		return false;
 	}
 	
 	private static boolean comprar(){
-		String user ="";
-		String passwd="";		
+		String deb ="";		
 		
 		dirServer = "192.168.0.7";
 			
 		try {	
-			System.out.println("Usuario: ");
-			user = br.readLine();	
-			System.out.println("Pass: ");
-			passwd = br.readLine();
+			System.out.println("Debito o crédito: ");
+			deb = br.readLine();
 		
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -181,8 +173,6 @@ public class Client {
 			rmiServer = (InterfazServidor) registry
 					.lookup("rmi://" + dirServer + ":1099/rmiServer");
 
-			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
-					.getHostAddress());
 			return rmiServer.buy(idTransaction.intValue());
 			
 		} catch (RemoteException e) {
@@ -191,10 +181,7 @@ public class Client {
 		} catch (NotBoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return false;
 		
 		

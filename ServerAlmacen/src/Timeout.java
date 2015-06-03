@@ -6,13 +6,12 @@ public class Timeout extends Thread {
 	}
 	
 	public void run (){
-		try {
-			Thread.sleep(600000);//100 min
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		long time = 100000000;
+		while (time-- != 0);
+
 		System.out.println("Murió una transacción." + t.getIp());
 		t.setFin(false);
 	}
+	
 }

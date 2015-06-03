@@ -8,7 +8,7 @@ public class Transaction {
 	private boolean escribio;
 	private HashMap<String, Integer> cart;
 	private Boolean fin;
-	
+	Thread th;
 	
 	public Transaction(String ip, int id) {
 		super();
@@ -20,7 +20,7 @@ public class Transaction {
 		fin = false;
 		cart = new HashMap<String, Integer>();
 		Timeout t = new Timeout(this);
-		Thread th = new Thread(t);
+		th = new Thread(t);
 		th.start();
 	}
 	
@@ -97,6 +97,11 @@ public class Transaction {
 	public void setFin(boolean b) {
 		// TODO Auto-generated method stub
 		fin = b;
+	}
+	
+	public void stop (){
+			th.stop();
+	
 	}
 	
 	

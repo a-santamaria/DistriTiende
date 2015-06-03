@@ -16,6 +16,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class StartServer implements InterfazServidor{
 	
@@ -25,7 +26,7 @@ public class StartServer implements InterfazServidor{
 	 */
 	private static final long serialVersionUID = 1L;
 	private HashMap<String, Integer> products;
-	private ArrayList<Transaction> transactions;
+	private HashMap<Integer,Transaction> transactions;
 	private static int idTransaction;
 	private String ipServer;
 	private HashMap<String,String> userPass;
@@ -52,7 +53,7 @@ public class StartServer implements InterfazServidor{
 	
     public StartServer() throws RemoteException {
     	
-    	transactions = new ArrayList<Transaction>();
+    	transactions = new HashMap<Integer, Transaction>();
     	this.idTransaction = 0;
     	userPass = new HashMap<String, String>();
     	userPass.put("user", "user");
@@ -99,7 +100,7 @@ public class StartServer implements InterfazServidor{
 
 	public InfoTransaction startTransaction(Object ip) throws RemoteException {
 		System.out.println("nuevo cliente ip: "+ ip );
-		transactions.add(new Transaction((String)ip, idTransaction++));
+		transactions.put(idTransaction,new Transaction((String)ip, idTransaction++));
 		
 		return new InfoTransaction(products, idTransaction-1);
 	}
@@ -126,9 +127,12 @@ public class StartServer implements InterfazServidor{
 	
 	public boolean buy(int idTransaction){
 		
-		int idFin = idTransaction++;
+		int idFin = this.idTransaction++;
 		transactions.get(idTransaction).setIdFin(idFin);
-		for(Transaction t : transactions){
+		transactions.get(idTransaction).stop();
+		Set<Integer> key = transactions.keySet();
+		for(Integer i : key){
+			Transaction t = transactions.get(i);
 			if(t.getFin())
 				continue;
 			
@@ -142,7 +146,6 @@ public class StartServer implements InterfazServidor{
 			}
 			
 		}
-		
 		//actualizar productos
 		for(Entry<String, Integer> e : transactions.get(idTransaction).getCart().entrySet()){
 			products.put(e.getKey(), products.get(e.getValue())-e.getValue());
