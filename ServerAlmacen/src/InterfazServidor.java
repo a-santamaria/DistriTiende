@@ -8,4 +8,6 @@ public interface InterfazServidor<String, Integer>  extends Remote{
 	  public void addToCart(int idTransaction, String producto, int cantidad) throws RemoteException;
 	  public void deleteItem(int idTransaction, Object producto) throws RemoteException;
 	  public void modifyItem(int idTransaction, Object producto, int num) throws RemoteException;
+	  public boolean login (String user,String passwd)throws RemoteException;
+	  public boolean signin (String user,String passwd)throws RemoteException;
 }

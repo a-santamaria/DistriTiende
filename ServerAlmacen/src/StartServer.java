@@ -28,6 +28,7 @@ public class StartServer implements InterfazServidor{
 	private ArrayList<Transaction> transactions;
 	private static int idTransaction;
 	private String ipServer;
+	private HashMap<String,String> userPass;
 	
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
@@ -53,7 +54,8 @@ public class StartServer implements InterfazServidor{
     	
     	transactions = new ArrayList<Transaction>();
     	this.idTransaction = 0;
-    	
+    	userPass = new HashMap<String, String>();
+    	userPass.put("user", "user");
     	try {
     		ipServer = InetAddress.getLocalHost().getHostAddress();
     		System.out.println("ipServer: "+ipServer);
@@ -145,6 +147,28 @@ public class StartServer implements InterfazServidor{
 		}
 		return true;		
 	}
+
+	public boolean login(Object user, Object passwd) throws RemoteException {
+		if (userPass.containsKey(user)){
+			if (userPass.get(user).equals(passwd)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean signin(Object user, Object passwd) throws RemoteException {
+		if (userPass.containsKey(user)){
+			return false;
+		}else{
+			String key = (String) user;
+			String value = (String) passwd;
+			userPass.put(key, value);
+			return true;
+		}
+		
+	}
+
 }
 
 

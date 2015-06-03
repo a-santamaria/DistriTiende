@@ -37,12 +37,45 @@ public class Client {
 		idTransaction = -1;
 		cart = new HashMap();
 		br = new BufferedReader(new InputStreamReader(System.in));
-
+		
 		String opcion = "-1";
-		do {
-			System.out.println("Seleccione la Opción: ");
+		boolean flag =true;
+		do{
 			System.out.println("1 - Registrarse");
 			System.out.println("2 - Iniciar Sección");
+			try {
+				opcion = br.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			switch (opcion){
+				case "1":
+					if (registrarse()){
+						System.out.println("Se ha registrado");
+					}else{
+						System.out.println("No se ha registrado");
+					}
+					break;
+				case "2":
+					if (iniciarSesion()){
+						flag = false;
+						startTransaction();
+						System.out.println("Transaccion Iniciada con id = "+ idTransaction);
+					}else{
+						System.out.println("Error!!!");
+					}
+					break;
+			
+			}
+			
+		}while(flag);
+		
+		
+		
+		
+		do {
+			System.out.println("Seleccione la Opción: ");
 			System.out.println("3 - Agregar Productos a Carrito");
 			System.out.println("4 - Mostrar Carrito");
 			System.out.println("5 - Comprar");
@@ -52,15 +85,7 @@ public class Client {
 			
 
 				switch (opcion) {
-	
-				case "1":
-					
-					break;
-				case "2":
-					startTransaction();
-					System.out.println("Transaccion Iniciada con id = "+ idTransaction);
-					break;
-	
+		
 				case "3":
 					agregarProductos();
 					break;
@@ -83,7 +108,91 @@ public class Client {
 
 	}
 		
+	private static boolean iniciarSesion (){
+		String user ="";
+		String passwd="";		
 		
+		dirServer = "192.168.0.7";
+			
+		try {	
+			System.out.println("Usuario: ");
+			user = br.readLine();	
+			System.out.println("Pass: ");
+			passwd = br.readLine();
+		
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+
+		try {
+
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			rmiServer = (InterfazServidor) registry
+					.lookup("rmi://" + dirServer + ":1099/rmiServer");
+
+			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
+					.getHostAddress());
+			return rmiServer.login(user, passwd);
+
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return false;
+	}
+	
+	
+	private static boolean registrarse (){
+		String user ="";
+		String passwd="";		
+		
+		dirServer = "192.168.0.7";
+			
+		try {	
+			System.out.println("Usuario: ");
+			user = br.readLine();	
+			System.out.println("Pass: ");
+			passwd = br.readLine();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+
+		try {
+
+			Registry registry = LocateRegistry.getRegistry(dirServer, 1099);
+			rmiServer = (InterfazServidor) registry
+					.lookup("rmi://" + dirServer + ":1099/rmiServer");
+
+			InfoTransaction info = rmiServer.startTransaction(InetAddress.getLocalHost()
+					.getHostAddress());
+			return rmiServer.signin(user, passwd);
+
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return false;
+	}
 		
 	private static void mostrarCarrito() {
 		

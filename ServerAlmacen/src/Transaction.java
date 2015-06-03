@@ -7,7 +7,7 @@ public class Transaction {
 	private int idFin;
 	private boolean escribio;
 	private HashMap<String, Integer> cart;
-	
+	private boolean fin;
 	
 	
 	public Transaction(String ip, int id) {
@@ -17,6 +17,7 @@ public class Transaction {
 		escribio = false;
 		idInicio = -1;
 		idFin = -1;
+		fin = false;
 		cart = new HashMap<String, Integer>();
 	}
 	
