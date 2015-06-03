@@ -23,6 +23,7 @@ public class StartServer implements InterfazServidor{
 	private static final long serialVersionUID = 1L;
 	private HashMap<String, Integer> products;
 	private ArrayList<Transaction> transactions;
+	private static int idTransaction;
 	
 	public void RegisterTransaction(){
  	    //System.setProperty("java.rmi.server.codebase",Task.class.getProtectionDomain().getCodeSource().getLocation().toString());   
@@ -70,7 +71,7 @@ public class StartServer implements InterfazServidor{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
+    	this.idTransaction = 0;
     	
     }
     
@@ -86,7 +87,7 @@ public class StartServer implements InterfazServidor{
 
 	public HashMap startTransaction(Object ip) throws RemoteException {
 		System.out.println("nuevo cliente ip: "+ ip );
-		transactions.add(new Transaction((String)ip, transactions.size()));
+		transactions.add(new Transaction((String)ip, idTransaction++));
 		return products;
 	}
 
@@ -100,6 +101,19 @@ public class StartServer implements InterfazServidor{
 	
 	
 	public void buy(int idTransaction){
+		
+		int idFin = idTransaction++;
+		transactions.get(idTransaction).setIdFin(idFin);
+		for(Transaction t : transactions){
+			
+			if(t.getId() >= idTransaction ||
+			  (t.getIdFin() != -1 && t.getIdFin() < idFin))
+				continue;
+			
+			
+			
+		}
+		
 		
 	}
 }

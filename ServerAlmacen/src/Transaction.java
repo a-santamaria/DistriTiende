@@ -2,18 +2,21 @@ import java.util.HashMap;
 
 
 public class Transaction {
-	public String ip;
-	public int id;
-	public boolean escribio;
-	HashMap<String, Integer> cart;
+	private String ip;
+	private int idInicio;
+	private int idFin;
+	private boolean escribio;
+	private HashMap<String, Integer> cart;
 	
 	
 	
 	public Transaction(String ip, int id) {
 		super();
 		this.ip = ip;
-		this.id = id;
+		this.idInicio = id;
 		escribio = false;
+		idInicio = -1;
+		idFin = -1;
 	}
 	
 	void yaEscribi(){
@@ -23,4 +26,54 @@ public class Transaction {
 	void addToCart(String product, int cant){
 		cart.put(product, cant);
 	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public int getId() {
+		return idInicio;
+	}
+
+	public void setId(int id) {
+		this.idInicio = id;
+	}
+
+	public boolean isEscribio() {
+		return escribio;
+	}
+
+	public void setEscribio(boolean escribio) {
+		this.escribio = escribio;
+	}
+
+	public HashMap<String, Integer> getCart() {
+		return cart;
+	}
+
+	public void setCart(HashMap<String, Integer> cart) {
+		this.cart = cart;
+	}
+
+	public int getIdInicio() {
+		return idInicio;
+	}
+
+	public void setIdInicio(int idInicio) {
+		this.idInicio = idInicio;
+	}
+
+	public int getIdFin() {
+		return idFin;
+	}
+
+	public void setIdFin(int idFin) {
+		this.idFin = idFin;
+	}
+	
+	
 }
