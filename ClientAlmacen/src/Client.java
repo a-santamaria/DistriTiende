@@ -30,6 +30,10 @@ public class Client {
 
 	public static void main(String[] args) {
 		
+		System.setProperty(
+				"java.security.policy",
+				"C:/Users/js/Desktop/Distri/DistriTiende/ClientAlmacen/src/policy.policy");
+		
 		idTransaction = -1;
 		cart = new HashMap();
 		br = new BufferedReader(new InputStreamReader(System.in));
@@ -76,11 +80,12 @@ public class Client {
 		} while (!opcion.equals("5"));
 
 	}
-
-
+		
+		
+		
 	public static void startTransaction() {
 		// change to real ip
-		dirServer = "localhost";
+		dirServer = "192.168.0.7";
 		productMap = new HashMap<String, Integer>();
 
 		try {
@@ -129,7 +134,7 @@ public class Client {
 				System.out.println("digite la cantidad:");
 				String cantidad = br.readLine();
 				
-				int id = Integer.parseInt(identi);
+				int id = Integer.parseInt(identi.trim());
 				int cant = Integer.parseInt(cantidad);
 				
 				if(id >= productMap.size()){
@@ -142,18 +147,18 @@ public class Client {
 					continue;
 				}
 				
-				if(!cart.containsKey(idProductos.get(i))){
-					int newValue = productMap.get(idProductos.get(i)) - cant;
+				if(!cart.containsKey(idProductos.get(id))){
+					int newValue = productMap.get(idProductos.get(id)) - cant;
 					productMap.put(idProductos.get(id), newValue);
-					cart.put(idProductos.get(i), cant);
+					cart.put(idProductos.get(id), cant);
 					
-					rmiServer.addToCart(idTransaction, idProductos.get(i), cant);
+					rmiServer.addToCart(idTransaction, idProductos.get(id), cant);
 				}else{
-					int newValue = productMap.get(idProductos.get(i)) - cant;
+					int newValue = productMap.get(idProductos.get(id)) - cant;
 					productMap.put(idProductos.get(id), newValue);
-					cart.put(idProductos.get(i), cart.get(idProductos.get(i))+cant);
+					cart.put(idProductos.get(id), cart.get(idProductos.get(id))+cant);
 					
-					rmiServer.modifyItem(idTransaction, idProductos.get(i), cant);
+					rmiServer.modifyItem(idTransaction, idProductos.get(id), cant);
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
