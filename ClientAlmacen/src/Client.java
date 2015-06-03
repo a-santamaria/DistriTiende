@@ -108,7 +108,7 @@ public class Client {
 			try {
 				String opcion = br.readLine();
 				
-				if(opcion.equals(-1)) return;
+				if(opcion.equals("-1")) return;
 				switch (opcion) {
 				
 				case "1":
